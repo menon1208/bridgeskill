@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block content %}
+
+<header class="nav">
+<div class="logo">BridgeSkill</div>
+<div class="links">
+<a href="/login">Login</a>
+<a href="/signup" class="btn-primary">Get Started</a>
+</div>
+</header>
+
+<section class="hero">
+<div>
+<h1>Shape Your Future With<br>Industry-Level Mentorship</h1>
+<p>Learn practical skills, gain confidence and build a career that actually works.</p>
+
+<div class="actions">
+<a href="/signup" class="btn student">Join as Student</a>
+<a href="/signup" class="btn mentor">Join as Mentor</a>
+</div>
+</div>
+
+<img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png">
+</section>
+
+<section class="features">
+<div class="card">Hand-picked mentors from real industries</div>
+<div class="card">Skill-driven roadmap focused on real jobs</div>
+<div class="card">Professional growth tracking & guidance</div>
+</section>
+
+{% endblock %}
