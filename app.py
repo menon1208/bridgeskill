@@ -1,46 +1,40 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, request, jsonify
+from werkzeug.security import generate_password_hash, check_password_hash
+import psycopg2
+import os
 
 app = Flask(__name__)
 
-@app.route("/")
-def index():
-    return render_template("index.html")
+DATABASE_URL = os.environ.get("DATABASE_URL")
 
-@app.route("/login", methods=["GET", "POST"])
-def login():
-    error = None
-    if request.method == "POST":
-        email = request.form.get("email")
-        password = request.form.get("password")
-        role = request.form.get("role")
+def get_db():
+    return psycopg2.connect(DATABASE_URL)
 
-        if email != "demo@gmail.com":
-            error = "Wrong email"
-        elif password != "1234":
-            error = "Wrong password"
-        else:
-            if role == "student":
-                return redirect(url_for("student_dashboard"))
-            else:
-                return redirect(url_for("mentor_dashboard"))
-
-    return render_template("login.html", error=error)
-
-@app.route("/signup", methods=["GET", "POST"])
+@app.route("/signup", methods=["POST"])
 def signup():
-    if request.method == "POST":
-        return redirect(url_for("login"))
-    return render_template("signup.html")
+    data = request.get_json()
 
-@app.route("/student")
-def student_dashboard():
-    return render_template("student_dashboard.html")
+    name = data.get("name")
+    email = data.get("email")
+    password = data.get("password")
 
-@app.route("/mentor")
-def mentor_dashboard():
-    return render_template("mentor_dashboard.html")
-import os
+    if not name or not email or not password:
+        return jsonify({"error": "Missing fields"}), 400
 
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
+    hashed = generate_password_hash(password)
+
+    try:
+        conn = get_db()
+        cur = conn.cursor()
+        cur.execute(
+            "INSERT INTO users (name, email, password_hash) VALUES (%s, %s, %s)",
+            (name, email, hashed)
+        )
+        conn.commit()
+        cur.close()
+        conn.close()
+
+        return jsonify({"message": "User created successfully"}), 201
+
+    except psycopg2.errors.UniqueViolation:
+        return jsonify({"error": "Email already exists"}), 409

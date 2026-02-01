@@ -1,11 +1,5 @@
 import psycopg2
+import os
 
 def connect_db():
-    return psycopg2.connect(
-        host="localhost",
-        database="bridgeskill",
-        user="postgres",
-        password="123456"
-    )
-
-
+    return psycopg2.connect(os.environ.get("DATABASE_URL"))
