@@ -39,3 +39,8 @@ def student_dashboard():
 @app.route("/mentor")
 def mentor_dashboard():
     return render_template("mentor_dashboard.html")
+import os
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
